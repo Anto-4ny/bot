@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
@@ -7,27 +7,25 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 
 app = Flask(__name__)
-CORS(app)  # Allows requests from the frontend
+CORS(app)  # Enable Cross-Origin Requests
 
 def start_booking():
-    driver = uc.Chrome()
+    options = uc.ChromeOptions()
+    driver = uc.Chrome(options=options)  # Use Chrome options to avoid detection
 
-    # Open VFS Global login page
-    driver.get("https://visa.vfsglobal.com/sgp/en/prt/login")
-    time.sleep(10)  # Wait for user to log in manually
-
-    # Wait for user login
     try:
+        # Open VFS Global login page
+        driver.get("https://visa.vfsglobal.com/sgp/en/prt/login")
+        time.sleep(10)  # Wait for user to log in manually
+
+        # Wait for user login
         WebDriverWait(driver, 30).until(EC.url_contains("/dashboard"))
-    except:
-        return {"status": "error", "message": "Login failed or took too long"}
 
-    # Navigate to booking page
-    driver.get("https://visa.vfsglobal.com/cpv/en/prt/application-detail")
-    time.sleep(5)
+        # Navigate to booking page
+        driver.get("https://visa.vfsglobal.com/cpv/en/prt/application-detail")
+        time.sleep(5)
 
-    # Try to book an appointment
-    try:
+        # Try to book an appointment
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "available-date")))
         driver.find_elements(By.CLASS_NAME, "available-date")[0].click()
         driver.find_element(By.ID, "continue-button").click()
@@ -37,8 +35,12 @@ def start_booking():
         time.sleep(2)
 
         return {"status": "success", "message": "Booking Completed Successfully!"}
+    
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+    finally:
+        driver.quit()  # Ensure Chrome closes after booking
 
 @app.route("/api/book", methods=["POST"])
 def book():
@@ -47,7 +49,7 @@ def book():
 
 @app.route("/")
 def home():
-    return render_template("index.ejs")
+    return send_from_directory("views", "index.ejs")  # Serve EJS file as a static page
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)  # Run Flask on port 5000
