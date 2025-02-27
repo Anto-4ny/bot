@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify
 from flask_cors import CORS
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
@@ -46,10 +46,6 @@ def start_booking():
 def book():
     result = start_booking()
     return jsonify(result)
-
-@app.route("/")
-def home():
-    return send_from_directory("views", "index.ejs")  # Serve EJS file as a static page
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)  # Run Flask on port 5000

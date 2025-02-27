@@ -12,7 +12,12 @@
         "type": "git",
         "url": "git+https://github.com/Anto-4ny/bot.git"
     },
-    "keywords": ["bot", "visa-booking", "selenium", "automation"],
+    "keywords": [
+        "bot",
+        "visa-booking",
+        "selenium",
+        "automation"
+    ],
     "author": "Anto-4ny",
     "license": "ISC",
     "bugs": {
@@ -20,9 +25,10 @@
     },
     "homepage": "https://github.com/Anto-4ny/bot#readme",
     "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
         "ejs": "^3.1.10",
         "express": "^4.21.2",
-        "node-fetch": "^3.3.2",
-        "dotenv": "^16.3.1"
+        "node-fetch": "^3.3.2"
     }
 }
