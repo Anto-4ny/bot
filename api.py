@@ -1,17 +1,24 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-import undetected_chromedriver as uc
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 import time
 
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Requests
 
 def start_booking():
-    options = uc.ChromeOptions()
-    driver = uc.Chrome(options=options)  # Use Chrome options to avoid detection
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Run without GUI (important for Vercel)
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)  
 
     try:
         # Open VFS Global login page
