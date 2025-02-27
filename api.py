@@ -1,60 +1,47 @@
+import os
+import subprocess
 from flask import Flask, jsonify
 from flask_cors import CORS
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
-import os
+from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
-CORS(app)  # Enable Cross-Origin Requests
+CORS(app)  # Enable CORS for cross-origin requests
 
-# Define Chrome and ChromeDriver paths (for Vercel)
-CHROMEDRIVER_PATH = "/usr/bin/chromedriver"
-GOOGLE_CHROME_PATH = "/usr/bin/google-chrome"
+def install_playwright():
+    """Ensure Playwright and browsers are installed in Vercel runtime."""
+    subprocess.run("playwright install chromium", shell=True, check=True)
 
 def start_booking():
-    options = webdriver.ChromeOptions()
-    options.binary_location = GOOGLE_CHROME_PATH  # Use Vercel's Chrome binary
-    options.add_argument("--headless")  # Run in headless mode (no GUI)
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")  # Improve stability
-    options.add_argument("--disable-blink-features=AutomationControlled")  # Evade detection
+    """Automate visa booking using Playwright."""
+    install_playwright()  # Ensure Playwright is installed
 
-    # Use pre-installed ChromeDriver
-    service = webdriver.chrome.service.Service(CHROMEDRIVER_PATH)
-    driver = webdriver.Chrome(service=service, options=options)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)  # Set to False if you want to see browser
+        page = browser.new_page()
 
-    try:
-        # Open VFS Global login page
-        driver.get("https://visa.vfsglobal.com/sgp/en/prt/login")
-        time.sleep(10)  # Wait for user to log in manually
+        try:
+            # Open VFS Global login page
+            page.goto("https://visa.vfsglobal.com/sgp/en/prt/login")
 
-        # Wait for user login
-        WebDriverWait(driver, 30).until(EC.url_contains("/dashboard"))
+            # Wait for user to manually log in
+            input("Press Enter after logging in...")
 
-        # Navigate to booking page
-        driver.get("https://visa.vfsglobal.com/cpv/en/prt/application-detail")
-        time.sleep(5)
+            # Navigate to booking page
+            page.goto("https://visa.vfsglobal.com/cpv/en/prt/application-detail")
 
-        # Try to book an appointment
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "available-date")))
-        driver.find_elements(By.CLASS_NAME, "available-date")[0].click()
-        driver.find_element(By.ID, "continue-button").click()
-        time.sleep(3)
+            # Select available date and confirm booking
+            page.wait_for_selector(".available-date")
+            page.click(".available-date")
+            page.click("#continue-button")
+            page.click("#submit-button")
 
-        driver.find_element(By.ID, "submit-button").click()
-        time.sleep(2)
+            return {"status": "success", "message": "Booking Completed Successfully!"}
 
-        return {"status": "success", "message": "Booking Completed Successfully!"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
 
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-    finally:
-        driver.quit()  # Ensure Chrome closes after booking
+        finally:
+            browser.close()
 
 @app.route("/api/book", methods=["POST"])
 def book():

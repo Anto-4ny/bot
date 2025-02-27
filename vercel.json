@@ -6,8 +6,11 @@
     "routes": [
         { "src": "/api/(.*)", "dest": "api.py" }
     ],
-    "env": {
-        "GOOGLE_CHROME_BIN": "/usr/bin/google-chrome",
-        "CHROMEDRIVER_PATH": "/usr/bin/chromedriver"
+    "build": {
+        "commands": ["sh vercel_build.sh"],
+        "env": {
+            "PYTHONUNBUFFERED": "1"
+        }
     }
 }
+
