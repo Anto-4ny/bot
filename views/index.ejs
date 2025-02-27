@@ -23,20 +23,14 @@
 
 <!-- Header -->
 <header class="flex items-center justify-between px-8 py-4 bg-black shadow-lg fixed w-full top-0 z-50">
-    <a href="/index" class="flex items-center space-x-2">
+    <a href="#" class="flex items-center space-x-2">
         <span class="text-4xl font-extrabold text-white tracking-wide">V</span>
         <span class="text-4xl font-extrabold text-blue-400 tracking-wide">F</span>
         <span class="text-4xl font-extrabold text-gray-300 tracking-wide">S</span>
     </a>
     
     <!-- Desktop Navigation -->
-    <nav class="hidden lg:flex space-x-8">
-        <a href="/dashboard" class="text-white text-lg font-semibold hover:text-blue-400 transition duration-300">Home</a>
-            <a href="/booking" 
-           class="text-white text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-transform duration-300">
-           Book Now
-        </a>
-    </nav>
+   
 
     <!-- Mobile Navigation Icon -->
     <button id="hamburger-icon" class="text-white text-3xl lg:hidden">
@@ -52,10 +46,7 @@
     </div>
     <div class="p-6 flex flex-col space-y-6">
         <a href="/" class="text-white text-lg hover:text-blue-400">Home</a>
-        <a href="/index" 
-           class="text-white text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 rounded-full text-center shadow-lg">
-           Book Now
-        </a>
+       
     </div>
 </nav>
 
@@ -97,7 +88,7 @@
     </p>
 
     <div class="mt-8 flex flex-col md:flex-row gap-6">
-        <a href="/chatbot" class="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-lg transition-all">
+        <a onclick="bookAppointment()" class="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-lg transition-all">
             💬 We are here to help
         </a>
         <button onclick="bookAppointment()" class="px-8 py-4 bg-green-500 hover:bg-green-600 text-white text-lg font-semibold rounded-lg shadow-lg transition-all">
