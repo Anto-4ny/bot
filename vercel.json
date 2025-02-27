@@ -11,7 +11,7 @@
     "build": {
         "commands": [
             "pip install -r requirements.txt",
-            "bash playwright_startup.sh",
+            "python -m playwright install --with-deps",
             "sh vercel_build.sh"
         ],
         "env": {
