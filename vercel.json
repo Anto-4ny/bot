@@ -9,10 +9,13 @@
         { "src": "/(.*)", "dest": "server.js" }
     ],
     "build": {
-        "commands": ["sh vercel_build.sh"],
+        "commands": [
+            "pip install -r requirements.txt",
+            "bash playwright_startup.sh",
+            "sh vercel_build.sh"
+        ],
         "env": {
             "PYTHONUNBUFFERED": "1"
         }
     }
 }
-
