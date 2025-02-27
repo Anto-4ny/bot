@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 // Route to trigger booking API
 app.post("/book", async (req, res) => {
     try {
-        let response = await fetch("https://your-vercel-domain/api/book", { method: "POST" });
+        let response = await fetch("https://bot-six-beige.vercel.app/api/book", { method: "POST" });
         let data = await response.json();
         res.json(data);
     } catch (error) {
