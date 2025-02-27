@@ -1,21 +1,22 @@
 {
     "version": 2,
     "builds": [
-        { "src": "api.py", "use": "@vercel/python" },
-        { "src": "server.js", "use": "@vercel/node" }
+      { "src": "api.py", "use": "@vercel/python" },
+      { "src": "server.js", "use": "@vercel/node" }
     ],
     "routes": [
-        { "src": "/api/(.*)", "dest": "api.py" },
-        { "src": "/(.*)", "dest": "server.js" }
+      { "src": "/api/(.*)", "dest": "api.py" },
+      { "src": "/(.*)", "dest": "server.js" }
     ],
     "build": {
-        "commands": [
-            "pip install -r requirements.txt",
-            "python -m playwright install --with-deps",
-            "sh vercel_build.sh"
-        ],
-        "env": {
-            "PYTHONUNBUFFERED": "1"
-        }
+      "commands": [
+        "pip install -r requirements.txt",
+        "pip playwright -m install --with-deps chromium"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "PLAYWRIGHT_BROWSERS_PATH": "/usr/local/share/pw-browsers"
+      }
     }
-}
+  }
+  
