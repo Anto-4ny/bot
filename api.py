@@ -1,47 +1,31 @@
-import os
-import subprocess
 from flask import Flask, jsonify
 from flask_cors import CORS
 from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for cross-origin requests
-
-def install_playwright():
-    """Ensure Playwright and browsers are installed in Vercel runtime."""
-    subprocess.run("playwright install chromium", shell=True, check=True)
+CORS(app)
 
 def start_booking():
     """Automate visa booking using Playwright."""
-    install_playwright()  # Ensure Playwright is installed
-
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set to False if you want to see browser
+        browser = p.chromium.launch(headless=True)  # Use lightweight Chromium
         page = browser.new_page()
+        
+        # Open VFS Global login page
+        page.goto("https://visa.vfsglobal.com/sgp/en/prt/login")
+        page.wait_for_load_state("networkidle")
 
-        try:
-            # Open VFS Global login page
-            page.goto("https://visa.vfsglobal.com/sgp/en/prt/login")
+        # Navigate to booking page
+        page.goto("https://visa.vfsglobal.com/cpv/en/prt/application-detail")
+        page.wait_for_selector(".available-date")
 
-            # Wait for user to manually log in
-            input("Press Enter after logging in...")
+        # Perform booking steps
+        page.click(".available-date")
+        page.click("#continue-button")
+        page.click("#submit-button")
 
-            # Navigate to booking page
-            page.goto("https://visa.vfsglobal.com/cpv/en/prt/application-detail")
-
-            # Select available date and confirm booking
-            page.wait_for_selector(".available-date")
-            page.click(".available-date")
-            page.click("#continue-button")
-            page.click("#submit-button")
-
-            return {"status": "success", "message": "Booking Completed Successfully!"}
-
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
-
-        finally:
-            browser.close()
+        browser.close()
+        return {"status": "success", "message": "Booking Completed Successfully!"}
 
 @app.route("/api/book", methods=["POST"])
 def book():
