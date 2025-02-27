@@ -126,31 +126,36 @@
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"></script>
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"></script>
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js"></script>
+        <script>
+           async function bookAppointment() {
+    let statusDiv = document.getElementById("booking-status");
+    statusDiv.innerText = "📅 Booking in progress...";
+    statusDiv.style.color = "yellow";
+
+    try {
+        let response = await fetch("http://127.0.0.1:5000/api/book", { 
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        let data = await response.json();
+
+        if (data.status === "success") {
+            statusDiv.innerText = "✅ " + data.message;
+            statusDiv.style.color = "green";
+        } else {
+            statusDiv.innerText = "❌ " + data.message;
+            statusDiv.style.color = "red";
+        }
+    } catch (error) {
+        statusDiv.innerText = "⚠️ Error connecting to server.";
+        statusDiv.style.color = "red";
+    }
+}
+        </script>
         
    
 <script type="module">
-        async function bookAppointment() {
-            let statusDiv = document.getElementById("booking-status");
-            statusDiv.innerText = "Booking in progress...";
-            statusDiv.style.color = "yellow";
-
-            try {
-                let response = await fetch("/book", { method: "POST" });
-                let data = await response.json();
-
-                if (response.ok) {
-                    statusDiv.innerText = "✅ " + data.message;
-                    statusDiv.style.color = "green";
-                } else {
-                    statusDiv.innerText = "❌ " + data.message;
-                    statusDiv.style.color = "red";
-                }
-            } catch (error) {
-                statusDiv.innerText = "⚠️ Error connecting to server.";
-                statusDiv.style.color = "red";
-            }
-        }
-    </script>
 
 document.addEventListener("DOMContentLoaded", () => {
     const hamburgerIcon = document.getElementById("hamburger-icon");
