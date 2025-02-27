@@ -4,21 +4,28 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
 import time
+import os
 
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Requests
 
+# Define Chrome and ChromeDriver paths (for Vercel)
+CHROMEDRIVER_PATH = "/usr/bin/chromedriver"
+GOOGLE_CHROME_PATH = "/usr/bin/google-chrome"
+
 def start_booking():
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")  # Run without GUI (important for Vercel)
+    options.binary_location = GOOGLE_CHROME_PATH  # Use Vercel's Chrome binary
+    options.add_argument("--headless")  # Run in headless mode (no GUI)
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")  # Improve stability
+    options.add_argument("--disable-blink-features=AutomationControlled")  # Evade detection
 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)  
+    # Use pre-installed ChromeDriver
+    service = webdriver.chrome.service.Service(CHROMEDRIVER_PATH)
+    driver = webdriver.Chrome(service=service, options=options)
 
     try:
         # Open VFS Global login page
@@ -42,7 +49,7 @@ def start_booking():
         time.sleep(2)
 
         return {"status": "success", "message": "Booking Completed Successfully!"}
-    
+
     except Exception as e:
         return {"status": "error", "message": str(e)}
 

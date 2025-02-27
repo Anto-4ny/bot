@@ -1,12 +1,13 @@
 {
     "version": 2,
     "builds": [
-      { "src": "api.py", "use": "@vercel/python" },
-      { "src": "server.js", "use": "@vercel/node" }
+        { "src": "api.py", "use": "@vercel/python" }
     ],
     "routes": [
-      { "src": "/api/.*", "dest": "api.py" },
-      { "src": "/.*", "dest": "server.js" }
-    ]
-  }
-  
+        { "src": "/api/(.*)", "dest": "api.py" }
+    ],
+    "env": {
+        "GOOGLE_CHROME_BIN": "/usr/bin/google-chrome",
+        "CHROMEDRIVER_PATH": "/usr/bin/chromedriver"
+    }
+}
