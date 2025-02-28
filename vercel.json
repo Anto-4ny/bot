@@ -9,7 +9,7 @@
   "build": {
     "commands": [
       "npm install",
-      "npm install puppeteer-core chrome-aws-lambda --unsafe-perm=true"
+      "npm install --unsafe-perm=true"
     ]
   }
 }
