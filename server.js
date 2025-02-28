@@ -1,8 +1,7 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
-import puppeteer from "puppeteer-core";  // ✅ Use "puppeteer-core" for Railway
-import chromium from "chrome-aws-lambda"; // ✅ Use "chrome-aws-lambda" to provide Chromium
+import { Builder, By, until } from "selenium-webdriver";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -29,33 +28,32 @@ app.get("/", (req, res) => {
     res.render("index");
 });
 
-// ✅ Booking automation using Puppeteer
+// ✅ Booking automation using Selenium
 const startBooking = async () => {
-    let browser;
+    let driver;
     try {
         console.log("🚀 Launching browser...");
-        browser = await puppeteer.launch({
-            args: chromium.args,
-            executablePath: await chromium.executablePath || null, // Removes hardcoded path
-            headless: chromium.headless,
-            defaultViewport: { width: 1280, height: 800 },
-            ignoreHTTPSErrors: true,
-        });
+        driver = await new Builder()
+            .forBrowser("chrome")
+            .usingServer("http://localhost:4444/wd/hub") // Change if needed
+            .build();
 
-        const page = await browser.newPage();
         console.log("🔗 Opening VFS Global login page...");
-        await page.goto("https://visa.vfsglobal.com/sgp/en/prt/login", { waitUntil: "networkidle2" });
+        await driver.get("https://visa.vfsglobal.com/sgp/en/prt/login");
+        await driver.wait(until.elementLocated(By.css("body")), 5000);
 
         console.log("📄 Navigating to booking page...");
-        await page.goto("https://visa.vfsglobal.com/cpv/en/prt/application-detail", { waitUntil: "domcontentloaded" });
+        await driver.get("https://visa.vfsglobal.com/cpv/en/prt/application-detail");
 
         console.log("📅 Selecting available date...");
-        await page.waitForSelector(".available-date");
-        await page.click(".available-date");
-        await page.waitForSelector("#continue-button");
-        await page.click("#continue-button");
-        await page.waitForSelector("#submit-button");
-        await page.click("#submit-button");
+        let dateButton = await driver.wait(until.elementLocated(By.css(".available-date")), 5000);
+        await dateButton.click();
+
+        let continueButton = await driver.wait(until.elementLocated(By.id("continue-button")), 5000);
+        await continueButton.click();
+
+        let submitButton = await driver.wait(until.elementLocated(By.id("submit-button")), 5000);
+        await submitButton.click();
 
         console.log("✅ Booking completed successfully!");
         return { status: "success", message: "Booking Completed Successfully!" };
@@ -63,8 +61,8 @@ const startBooking = async () => {
         console.error("❌ Booking failed:", error.message);
         return { status: "error", message: error.message };
     } finally {
-        if (browser) {
-            await browser.close();
+        if (driver) {
+            await driver.quit();
         }
     }
 };
