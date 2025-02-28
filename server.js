@@ -24,6 +24,12 @@ app.set("views", path.join(__dirname, "views"));
 // ✅ Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
+// ✅ Home route to serve index.ejs
+app.get("/", (req, res) => {
+    res.render("index"); // Ensure "index.ejs" exists inside the "views" folder
+});
+
+
 // ✅ Booking automation using Selenium
 const startBooking = async () => {
     let driver;
