@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import { Builder, By, until } from "selenium-webdriver";
+import chrome from "selenium-webdriver/chrome";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -23,37 +24,36 @@ app.set("views", path.join(__dirname, "views"));
 // ✅ Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ Home route
-app.get("/", (req, res) => {
-    res.render("index");
-});
-
 // ✅ Booking automation using Selenium
 const startBooking = async () => {
     let driver;
     try {
-        console.log("🚀 Launching browser...");
+        console.log("🚀 Launching Selenium Chrome...");
+
+        // ✅ Configure Chrome options
+        const chromeOptions = new chrome.Options();
+        chromeOptions.headless(); // Run in headless mode (no UI)
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-dev-shm-usage");
+        chromeOptions.setChromeBinaryPath("/usr/bin/google-chrome-stable"); // ✅ Set Chrome path
+
+        // ✅ Start Selenium WebDriver
         driver = await new Builder()
             .forBrowser("chrome")
-            .usingServer("http://localhost:4444/wd/hub") // Change if needed
+            .setChromeOptions(chromeOptions)
             .build();
 
         console.log("🔗 Opening VFS Global login page...");
         await driver.get("https://visa.vfsglobal.com/sgp/en/prt/login");
-        await driver.wait(until.elementLocated(By.css("body")), 5000);
 
         console.log("📄 Navigating to booking page...");
         await driver.get("https://visa.vfsglobal.com/cpv/en/prt/application-detail");
 
         console.log("📅 Selecting available date...");
-        let dateButton = await driver.wait(until.elementLocated(By.css(".available-date")), 5000);
-        await dateButton.click();
-
-        let continueButton = await driver.wait(until.elementLocated(By.id("continue-button")), 5000);
-        await continueButton.click();
-
-        let submitButton = await driver.wait(until.elementLocated(By.id("submit-button")), 5000);
-        await submitButton.click();
+        await driver.wait(until.elementLocated(By.css(".available-date")), 10000);
+        await driver.findElement(By.css(".available-date")).click();
+        await driver.findElement(By.id("continue-button")).click();
+        await driver.findElement(By.id("submit-button")).click();
 
         console.log("✅ Booking completed successfully!");
         return { status: "success", message: "Booking Completed Successfully!" };
