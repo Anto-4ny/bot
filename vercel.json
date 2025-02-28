@@ -1,22 +1,19 @@
 {
-    "version": 2,
-    "builds": [
-      { "src": "api.py", "use": "@vercel/python" },
-      { "src": "server.js", "use": "@vercel/node" }
+  "version": 2,
+  "builds": [
+    { "src": "server.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "server.js" }
+  ],
+  "build": {
+    "commands": [
+      "npm install",
+      "npm install puppeteer --unsafe-perm=true"
     ],
-    "routes": [
-      { "src": "/api/(.*)", "dest": "api.py" },
-      { "src": "/(.*)", "dest": "server.js" }
-    ],
-    "build": {
-      "commands": [
-        "pip install -r requirements.txt",
-        "pip playwright -m install --with-deps chromium"
-      ],
-      "env": {
-        "PYTHONUNBUFFERED": "1",
-        "PLAYWRIGHT_BROWSERS_PATH": "/usr/local/share/pw-browsers"
-      }
+    "env": {
+      "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "false",
+      "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/chromium"
     }
   }
-  
+}

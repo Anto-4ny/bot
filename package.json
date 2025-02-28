@@ -1,11 +1,11 @@
 {
     "name": "bot",
     "version": "1.0.0",
-    "description": "Visa booking bot using Selenium and Express.js",
+    "description": "Visa booking bot using Puppeteer and Express.js",
     "main": "server.js",
     "type": "module",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "install": "npm install",
         "start": "node server.js"
     },
     "repository": {
@@ -15,7 +15,7 @@
     "keywords": [
         "bot",
         "visa-booking",
-        "selenium",
+        "puppeteer",
         "automation"
     ],
     "author": "Anto-4ny",
@@ -29,6 +29,7 @@
         "dotenv": "^16.3.1",
         "ejs": "^3.1.10",
         "express": "^4.21.2",
-        "node-fetch": "^3.3.2"
+        "node-fetch": "^3.3.2",
+        "puppeteer": "^21.0.0"
     }
 }

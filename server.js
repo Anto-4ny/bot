@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import cors from "cors"; // ✅ Added CORS support
 import fetch from "node-fetch";
+import puppeteer from "puppeteer";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -28,24 +29,40 @@ app.get("/", (req, res) => {
     res.render("index");
 });
 
+// ✅ Booking automation using Puppeteer
+const startBooking = async () => {
+    try {
+        console.log("🚀 Launching browser...");
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+
+        console.log("🔗 Opening VFS Global login page...");
+        await page.goto("https://visa.vfsglobal.com/sgp/en/prt/login", { waitUntil: "networkidle2" });
+
+        console.log("📄 Navigating to booking page...");
+        await page.goto("https://visa.vfsglobal.com/cpv/en/prt/application-detail", { waitUntil: "domcontentloaded" });
+
+        console.log("📅 Selecting available date...");
+        await page.waitForSelector(".available-date");
+        await page.click(".available-date");
+        await page.click("#continue-button");
+        await page.click("#submit-button");
+
+        await browser.close();
+        console.log("✅ Booking completed successfully!");
+        return { status: "success", message: "Booking Completed Successfully!" };
+    } catch (error) {
+        console.error("❌ Booking failed:", error.message);
+        return { status: "error", message: error.message };
+    }
+};
+
 // ✅ Booking API route
 app.post("/book", async (req, res) => {
     try {
         console.log("📩 Booking request received:", req.body || "No body provided");
-
-        const response = await fetch("https://bot-six-beige.vercel.app/api/book", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(req.body || {}), // Ensure valid JSON body
-        });
-
-        if (!response.ok) {
-            throw new Error(`API responded with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("✅ Booking response:", data);
-        res.json(data);
+        const result = await startBooking();
+        res.json(result);
     } catch (error) {
         console.error("❌ Booking API Error:", error.message);
         res.status(500).json({ status: "error", message: "Server error occurred." });
