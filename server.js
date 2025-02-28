@@ -36,12 +36,11 @@ const startBooking = async () => {
     try {
         console.log("🚀 Launching Selenium Chrome...");
 
-        // ✅ Configure Chrome options
+// ✅ Configure Chrome options
 const chromeOptions = new chrome.Options();
-chromeOptions.addArguments("--headless=new"); // ✅ Correct way to enable headless mode
+chromeOptions.addArguments("--headless=new"); // ✅ Headless mode
 chromeOptions.addArguments("--no-sandbox");
 chromeOptions.addArguments("--disable-dev-shm-usage");
-chromeOptions.setChromeBinaryPath("/usr/bin/google-chrome-stable"); // ✅ Set Chrome path
 
         // ✅ Start Selenium WebDriver
         driver = await new Builder()
