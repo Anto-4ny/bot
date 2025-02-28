@@ -1,21 +1,15 @@
 {
   "version": 2,
   "builds": [
-    { "src": "server.js", "use": "@vercel/node" },
-    { "src": "views/index.ejs", "use": "@vercel/static" }
+    { "src": "server.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "server.js" },
-    { "src": "/(.*)", "dest": "views/index.ejs" }
+    { "src": "/api/(.*)", "dest": "server.js" }
   ],
   "build": {
     "commands": [
       "npm install",
       "npm install puppeteer-core chrome-aws-lambda --unsafe-perm=true"
-    ],
-    "env": {
-      "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
-      "PUPPETEER_EXECUTABLE_PATH": "node_modules/puppeteer-core/lib/chromium/chromium.exe"
-    }
+    ]
   }
 }

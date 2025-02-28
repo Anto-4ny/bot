@@ -2,8 +2,8 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import fetch from "node-fetch";
-import puppeteer from "puppeteer-core";
-import chromium from "chrome-aws-lambda";
+import puppeteer from "puppeteer-core";  // ✅ Use "puppeteer-core" for Vercel
+import chromium from "chrome-aws-lambda"; // ✅ Use "chrome-aws-lambda" to provide Chromium
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -37,8 +37,8 @@ const startBooking = async () => {
         console.log("🚀 Launching browser...");
         browser = await puppeteer.launch({
             args: chromium.args,
-            executablePath: await chromium.executablePath || "/usr/bin/chromium",
-            headless: true,
+            executablePath: await chromium.executablePath || process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+            headless: chromium.headless,
             defaultViewport: { width: 1280, height: 800 },
             ignoreHTTPSErrors: true,
         });
