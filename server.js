@@ -1,8 +1,9 @@
 import express from "express";
 import path from "path";
-import cors from "cors"; // ✅ Added CORS support
+import cors from "cors";
 import fetch from "node-fetch";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "chrome-aws-lambda";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -13,9 +14,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ✅ Middleware
-app.use(cors()); // Allow cross-origin requests
-app.use(express.json()); // Parse JSON request bodies
-app.use(express.urlencoded({ extended: true })); // Parse form data
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // ✅ Set EJS as view engine
 app.set("view engine", "ejs");
@@ -31,11 +32,18 @@ app.get("/", (req, res) => {
 
 // ✅ Booking automation using Puppeteer
 const startBooking = async () => {
+    let browser;
     try {
         console.log("🚀 Launching browser...");
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
+        browser = await puppeteer.launch({
+            args: chromium.args,
+            executablePath: await chromium.executablePath || "/usr/bin/chromium",
+            headless: true,
+            defaultViewport: { width: 1280, height: 800 },
+            ignoreHTTPSErrors: true,
+        });
 
+        const page = await browser.newPage();
         console.log("🔗 Opening VFS Global login page...");
         await page.goto("https://visa.vfsglobal.com/sgp/en/prt/login", { waitUntil: "networkidle2" });
 
@@ -45,15 +53,20 @@ const startBooking = async () => {
         console.log("📅 Selecting available date...");
         await page.waitForSelector(".available-date");
         await page.click(".available-date");
+        await page.waitForSelector("#continue-button");
         await page.click("#continue-button");
+        await page.waitForSelector("#submit-button");
         await page.click("#submit-button");
 
-        await browser.close();
         console.log("✅ Booking completed successfully!");
         return { status: "success", message: "Booking Completed Successfully!" };
     } catch (error) {
         console.error("❌ Booking failed:", error.message);
         return { status: "error", message: error.message };
+    } finally {
+        if (browser) {
+            await browser.close();
+        }
     }
 };
 
