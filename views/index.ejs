@@ -114,17 +114,22 @@
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"></script>
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"></script>
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js"></script>
+       
         <script>
-           async function bookAppointment() {
+async function bookAppointment() {
     let statusDiv = document.getElementById("booking-status");
     statusDiv.innerText = "📅 Booking in progress...";
     statusDiv.style.color = "yellow";
 
     try {
-        let response = await fetch("https://bot-six-beige.vercel.app/book", { 
+        let response = await fetch("https://bot-production-9c23.up.railway.app/book", { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
         let data = await response.json();
 
@@ -136,11 +141,12 @@
             statusDiv.style.color = "red";
         }
     } catch (error) {
-        statusDiv.innerText = "⚠️ Error connecting to server.";
+        console.error("Booking error:", error);
+        statusDiv.innerText = "⚠️ Server error. Please try again later.";
         statusDiv.style.color = "red";
     }
 }
-        </script>
+</script>
         
    
 <script type="module">
