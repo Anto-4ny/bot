@@ -4,11 +4,12 @@
     "description": "Visa booking bot using Selenium and Express.js on Railway",
     "main": "server.js",
     "type": "module",
+    
     "scripts": {
-        "start": "node server.js",
-        "dev": "nodemon server.js",
-        "postinstall": "apt-get update && apt-get install -y wget curl unzip && wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && dpkg -i /tmp/chrome.deb || apt-get -fy install && rm /tmp/chrome.deb && npm install chromedriver && ln -s /app/node_modules/chromedriver/bin/chromedriver /usr/local/bin/chromedriver"
-    },
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "postinstall": "apt-get update && apt-get install -y wget curl unzip chromium-driver && wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && dpkg -i /tmp/chrome.deb || apt-get -fy install && rm /tmp/chrome.deb"
+},
     "repository": {
         "type": "git",
         "url": "git+https://github.com/Anto-4ny/bot.git"

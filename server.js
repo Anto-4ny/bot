@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import { Builder, By, until } from "selenium-webdriver";
-import chrome from "selenium-webdriver/chrome.js"; // ✅ Fix import path
+import chrome from "selenium-webdriver/chrome.js"; 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -24,9 +24,9 @@ app.set("views", path.join(__dirname, "views"));
 // ✅ Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ Home route to serve index.ejs
+// ✅ Home route
 app.get("/", (req, res) => {
-    res.render("index"); // Ensure "index.ejs" exists inside the "views" folder
+    res.render("index");
 });
 
 // ✅ Booking automation using Selenium
@@ -35,16 +35,19 @@ const startBooking = async () => {
     try {
         console.log("🚀 Launching Selenium Chrome...");
 
-        // ✅ Set explicit Chrome & Chromedriver paths
-        const chromePath = "/usr/bin/google-chrome-stable"; // Adjust if needed
-        const driverPath = "/usr/local/bin/chromedriver";   // Adjust if needed
+        // ✅ Set explicit Chrome & ChromeDriver paths
+        const chromePath = "/usr/bin/google-chrome-stable"; // Ensure Chrome binary
+        const driverPath = "/usr/bin/chromedriver";  // Explicit ChromeDriver path
 
         // ✅ Configure Chrome options
         const chromeOptions = new chrome.Options();
-        chromeOptions.setChromeBinaryPath(chromePath); // Ensure correct Chrome binary
-        chromeOptions.addArguments("--headless=new");  // ✅ Headless mode
+        chromeOptions.setChromeBinaryPath(chromePath);
+        chromeOptions.addArguments("--headless=new"); 
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-dev-shm-usage");
+
+        // ✅ Set ChromeDriver manually
+        process.env.PATH += ":" + driverPath;  
 
         // ✅ Start Selenium WebDriver
         driver = await new Builder()
