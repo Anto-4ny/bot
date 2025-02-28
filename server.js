@@ -1,8 +1,8 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
-import { Builder, By, until } from "selenium-webdriver";
-import chrome from "selenium-webdriver/chrome";
+import { Builder, By, Key, until } from "selenium-webdriver";
+import chrome from "selenium-webdriver/chrome.js"; // ✅ Fix import path
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
