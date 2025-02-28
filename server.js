@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
-import { Builder, By, Key, until } from "selenium-webdriver";
+import { Builder, By, until } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js"; // ✅ Fix import path
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -29,18 +29,22 @@ app.get("/", (req, res) => {
     res.render("index"); // Ensure "index.ejs" exists inside the "views" folder
 });
 
-
 // ✅ Booking automation using Selenium
 const startBooking = async () => {
     let driver;
     try {
         console.log("🚀 Launching Selenium Chrome...");
 
-// ✅ Configure Chrome options
-const chromeOptions = new chrome.Options();
-chromeOptions.addArguments("--headless=new"); // ✅ Headless mode
-chromeOptions.addArguments("--no-sandbox");
-chromeOptions.addArguments("--disable-dev-shm-usage");
+        // ✅ Set explicit Chrome & Chromedriver paths
+        const chromePath = "/usr/bin/google-chrome-stable"; // Adjust if needed
+        const driverPath = "/usr/local/bin/chromedriver";   // Adjust if needed
+
+        // ✅ Configure Chrome options
+        const chromeOptions = new chrome.Options();
+        chromeOptions.setChromeBinaryPath(chromePath); // Ensure correct Chrome binary
+        chromeOptions.addArguments("--headless=new");  // ✅ Headless mode
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-dev-shm-usage");
 
         // ✅ Start Selenium WebDriver
         driver = await new Builder()
@@ -63,7 +67,7 @@ chromeOptions.addArguments("--disable-dev-shm-usage");
         console.log("✅ Booking completed successfully!");
         return { status: "success", message: "Booking Completed Successfully!" };
     } catch (error) {
-        console.error("❌ Booking failed:", error.message);
+        console.error("❌ Booking failed:", error);
         return { status: "error", message: error.message };
     } finally {
         if (driver) {
@@ -79,7 +83,7 @@ app.post("/book", async (req, res) => {
         const result = await startBooking();
         res.json(result);
     } catch (error) {
-        console.error("❌ Booking API Error:", error.message);
+        console.error("❌ Booking API Error:", error);
         res.status(500).json({ status: "error", message: "Server error occurred." });
     }
 });
