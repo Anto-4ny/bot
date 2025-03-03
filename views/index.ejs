@@ -123,8 +123,8 @@ async function bookAppointment() {
 
     try {
         let response = await fetch("https://bot-production-9c23.up.railway.app/book", { 
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: "GET",  // ✅ Changed from POST to GET
+            headers: { "Content-Type": "application/json" }
         });
 
         if (!response.ok) {

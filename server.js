@@ -29,16 +29,15 @@ app.get("/", (req, res) => {
     res.render("index"); // Ensure "index.ejs" exists inside the "views" folder
 });
 
-// ✅ Booking API route - Calls Python API
-app.post("/book", async (req, res) => {
+// ✅ Booking API route - Calls Python API using GET
+app.get("/book", async (req, res) => {
     try {
-        console.log("📩 Booking request received:", req.body || "No body provided");
+        console.log("📩 Booking request received");
 
-        // ✅ Forward request to Python API
+        // ✅ Forward request to Python API using GET
         const response = await fetch(`https://angelic-mindfulness-production.up.railway.app/book`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(req.body)
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
         });
 
         const result = await response.json();
@@ -48,6 +47,7 @@ app.post("/book", async (req, res) => {
         res.status(500).json({ status: "error", message: "Server error occurred." });
     }
 });
+
 
 // ✅ Start server
 app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
