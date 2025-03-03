@@ -5,6 +5,14 @@ FROM python:3.10 AS backend
 
 WORKDIR /app
 
+# Install system dependencies for Chrome & Selenium
+RUN apt-get update && apt-get install -y wget curl unzip \
+    libx11-xcb1 libxcomposite1 libxcursor1 libxi6 libxrandr2 libasound2 \
+    libatk1.0-0 libgtk-3-0 libnss3 libdrm2 libgbm1 && \
+    wget -qO- https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb > /tmp/chrome.deb && \
+    apt-get install -y /tmp/chrome.deb && \
+    rm /tmp/chrome.deb
+
 # Copy Python dependencies first
 COPY requirements.txt /app/
 
@@ -22,9 +30,9 @@ FROM node:18 AS frontend
 WORKDIR /app
 
 # Copy package.json & package-lock.json first for caching
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json ./ 
 
-# Fix: Set npm registry and install dependencies
+# Set npm registry and install dependencies
 RUN npm config set legacy-peer-deps true && npm cache clean --force
 RUN npm install --force || npm install --legacy-peer-deps
 
@@ -42,7 +50,7 @@ WORKDIR /app
 COPY --from=backend /app /app
 COPY --from=frontend /app /app
 
-# Install dependencies again for safety
+# Reinstall dependencies for safety
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Install Supervisor to manage both processes

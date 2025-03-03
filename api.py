@@ -16,6 +16,9 @@ def start_booking():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
+    # ✅ Use correct path for Chrome in Docker
+    options.binary_location = "/usr/bin/google-chrome"
+
     # ✅ Automatically fetch latest ChromeDriver
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
@@ -49,4 +52,4 @@ def book():
     return jsonify(result)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000)  # ✅ Corrected syntax
