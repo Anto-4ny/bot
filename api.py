@@ -1,4 +1,7 @@
-from flask import Flask, request, jsonify
+import os
+import subprocess
+import sys
+from flask import Flask, jsonify
 import traceback
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -14,23 +17,37 @@ app = Flask(__name__)
 def home():
     return "🚀 Flask API is running!"
 
+def install_chrome():
+    """Install Chrome based on OS (Windows or Linux)."""
+    try:
+        if sys.platform.startswith("win"):
+            print("🟢 Windows detected: Ensure Chrome is installed manually.")
+        else:
+            print("🟠 Linux detected: Installing Chrome...")
+            subprocess.run(["apt-get", "update"], check=True)
+            subprocess.run(["apt-get", "install", "-y", "google-chrome-stable"], check=True)
+            print("✅ Chrome installed successfully!")
+    except Exception as e:
+        print(f"❌ Chrome installation failed: {e}")
+
 def start_booking():
-    """Function to automate the visa booking process using Selenium."""
+    """Automate the booking process using Selenium."""
+    install_chrome()  # ✅ Ensure Chrome is installed
+
     options = Options()
-    options.add_argument("--headless=new")  # ✅ Headless mode
+    options.add_argument("--headless")  # ✅ Run in headless mode
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
-    # ✅ Use correct path for Chrome in Docker
-    options.binary_location = "/usr/bin/google-chrome"
+    # ✅ Set binary location only if on Linux (Railway)
+    if not sys.platform.startswith("win"):
+        options.binary_location = "/usr/bin/google-chrome"
 
-    # ✅ Automatically fetch latest ChromeDriver
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
 
     try:
         print("🚀 Launching Selenium Chrome...")
-
         driver.get("https://visa.vfsglobal.com/sgp/en/prt/login")
         print("🔗 Opened VFS Global login page...")
 
@@ -50,13 +67,12 @@ def start_booking():
     finally:
         driver.quit()
 
-@app.route("/book", methods=["GET"])
+@app.route("/book", methods=["GET"])  # ✅ Changed to GET
 def book():
-    """API route to trigger the booking process using GET."""
+    """API route to trigger the booking process."""
     print("📩 Booking request received")
     result = start_booking()
     return jsonify(result)
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True, threaded=True)
