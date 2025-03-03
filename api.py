@@ -29,7 +29,6 @@ def install_chrome():
             print("✅ Chrome installed successfully!")
     except Exception as e:
         print(f"❌ Chrome installation failed: {e}")
-
 def start_booking():
     """Automate the booking process using Selenium."""
     install_chrome()  # ✅ Ensure Chrome is installed
@@ -39,14 +38,24 @@ def start_booking():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
-    # ✅ Set binary location only if on Linux (Railway)
+    # ✅ Debug: Print OS Information
+    print(f"🖥️ Running on: {sys.platform}")
+    
+    # ✅ Set Chrome binary location only if on Linux (Railway)
     if not sys.platform.startswith("win"):
         options.binary_location = "/usr/bin/google-chrome"
-
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
+        print(f"🔎 Using Chrome binary: {options.binary_location}")
+    else:
+        print("🟢 Running on Windows - Chrome must be installed manually.")
 
     try:
+        # ✅ Debug: Check if ChromeDriver installs correctly
+        chromedriver_path = ChromeDriverManager().install()
+        print(f"🚀 ChromeDriver installed at: {chromedriver_path}")
+
+        service = Service(chromedriver_path)
+        driver = webdriver.Chrome(service=service, options=options)
+        
         print("🚀 Launching Selenium Chrome...")
         driver.get("https://visa.vfsglobal.com/sgp/en/prt/login")
         print("🔗 Opened VFS Global login page...")
@@ -60,12 +69,15 @@ def start_booking():
 
         print("✅ Booking completed successfully!")
         return {"status": "success", "message": "Booking Completed Successfully!"}
+
     except Exception as e:
         print(f"❌ Booking failed: {str(e)}")
         print(traceback.format_exc())
         return {"status": "error", "message": "Internal Server Error", "error": str(e)}
+
     finally:
         driver.quit()
+
 
 @app.route("/book", methods=["GET"])  # ✅ Changed to GET
 def book():
