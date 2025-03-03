@@ -1,16 +1,16 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
-import { Builder, By, until } from "selenium-webdriver";
-import chrome from "selenium-webdriver/chrome.js"; 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import fetch from "node-fetch"; // ✅ Import fetch to communicate with Python API
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const API_URL = process.env.API_URL || "http://localhost:5000"; // ✅ Python API URL
 
 // ✅ Middleware
 app.use(cors());
@@ -24,69 +24,27 @@ app.set("views", path.join(__dirname, "views"));
 // ✅ Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ Home route
+// ✅ Home route to serve index.ejs
 app.get("/", (req, res) => {
-    res.render("index");
+    res.render("index"); // Ensure "index.ejs" exists inside the "views" folder
 });
 
-// ✅ Booking automation using Selenium
-const startBooking = async () => {
-    let driver;
-    try {
-        console.log("🚀 Launching Selenium Chrome...");
-
-        // ✅ Set explicit Chrome & ChromeDriver paths
-        const chromePath = "/usr/bin/google-chrome-stable"; // Ensure Chrome binary
-        const driverPath = "/usr/bin/chromedriver";  // Explicit ChromeDriver path
-
-        // ✅ Configure Chrome options
-        const chromeOptions = new chrome.Options();
-        chromeOptions.setChromeBinaryPath(chromePath);
-        chromeOptions.addArguments("--headless=new"); 
-        chromeOptions.addArguments("--no-sandbox");
-        chromeOptions.addArguments("--disable-dev-shm-usage");
-
-        // ✅ Set ChromeDriver manually
-        process.env.PATH += ":" + driverPath;  
-
-        // ✅ Start Selenium WebDriver
-        driver = await new Builder()
-            .forBrowser("chrome")
-            .setChromeOptions(chromeOptions)
-            .build();
-
-        console.log("🔗 Opening VFS Global login page...");
-        await driver.get("https://visa.vfsglobal.com/sgp/en/prt/login");
-
-        console.log("📄 Navigating to booking page...");
-        await driver.get("https://visa.vfsglobal.com/cpv/en/prt/application-detail");
-
-        console.log("📅 Selecting available date...");
-        await driver.wait(until.elementLocated(By.css(".available-date")), 10000);
-        await driver.findElement(By.css(".available-date")).click();
-        await driver.findElement(By.id("continue-button")).click();
-        await driver.findElement(By.id("submit-button")).click();
-
-        console.log("✅ Booking completed successfully!");
-        return { status: "success", message: "Booking Completed Successfully!" };
-    } catch (error) {
-        console.error("❌ Booking failed:", error);
-        return { status: "error", message: error.message };
-    } finally {
-        if (driver) {
-            await driver.quit();
-        }
-    }
-};
-
-// ✅ Booking API route
+// ✅ Booking API route - Calls Python API
 app.post("/book", async (req, res) => {
     try {
         console.log("📩 Booking request received:", req.body || "No body provided");
-        const result = await startBooking();
+
+        // ✅ Forward request to Python API
+        const response = await fetch(`${API_URL}/book`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(req.body)
+        });
+
+        const result = await response.json();
         res.json(result);
     } catch (error) {
-        console.error("❌ Booking API Error:", error);
+        console.error("❌ Booking API Error:", error.message);
         res.status(500).json({ status: "error", message: "Server error occurred." });
     }
 });
