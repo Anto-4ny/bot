@@ -9,7 +9,7 @@
         "start": "node server.js",
         "dev": "nodemon server.js",
         "start-api": "python3 api.py",
-        "postinstall": "apt-get update && apt-get install -y wget curl unzip chromium-driver python3 python3-pip && wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && dpkg -i /tmp/chrome.deb || apt-get -fy install && rm /tmp/chrome.deb && pip3 install -r requirements.txt"
+        "postinstall": "node postinstall.js"
     },
     "repository": {
         "type": "git",
