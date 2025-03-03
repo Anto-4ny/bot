@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import traceback
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -8,6 +9,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 
 app = Flask(__name__)
+
+@app.route("/", methods=["GET"])
+def home():
+    return "🚀 Flask API is running!"
 
 def start_booking():
     """Function to automate the visa booking process using Selenium."""
@@ -40,7 +45,8 @@ def start_booking():
         return {"status": "success", "message": "Booking Completed Successfully!"}
     except Exception as e:
         print(f"❌ Booking failed: {str(e)}")
-        return {"status": "error", "message": str(e)}
+        print(traceback.format_exc())
+        return {"status": "error", "message": "Internal Server Error", "error": str(e)}
     finally:
         driver.quit()
 
@@ -52,4 +58,4 @@ def book():
     return jsonify(result)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
+    app.run(host="0.0.0.0", port=5000, debug=True, threaded=True)
