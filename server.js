@@ -35,7 +35,7 @@ app.post("/book", async (req, res) => {
         console.log("📩 Booking request received:", req.body || "No body provided");
 
         // ✅ Forward request to Python API
-        const response = await fetch(`${API_URL}/book`, {
+        const response = await fetch(`https://angelic-mindfulness-production.up.railway.app/book`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(req.body)
