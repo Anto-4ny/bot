@@ -8,8 +8,8 @@ WORKDIR /app
 # Copy Python files
 COPY api.py requirements.txt /app/
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies, including Flask
+RUN pip install --no-cache-dir -r requirements.txt && pip install flask
 
 # ===========================
 # Frontend (Node.js)
