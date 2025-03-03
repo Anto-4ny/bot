@@ -35,7 +35,7 @@ app.get("/book", async (req, res) => {
         console.log("📩 Booking request received");
 
         // ✅ Forward request to Python API using GET
-        const response = await fetch(`/book`, {
+        const response = await fetch(`https://angelic-mindfulness-production.up.railway.app/book`, {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         });
