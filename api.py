@@ -35,9 +35,11 @@ def start_booking():
     install_chrome()  # ✅ Ensure Chrome is installed
 
     options = Options()
-    options.add_argument("--headless")  # ✅ Run in headless mode
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    
+    # 🔥 Remove headless mode so user can see the browser
+    # options.add_argument("--headless")  <-- 🔴 COMMENT THIS OUT
 
     print(f"🖥️ Running on: {sys.platform}")
     
@@ -57,13 +59,13 @@ def start_booking():
         
         print("🚀 Launching Selenium Chrome...")
         
-        # 1️⃣ Open VFS login page
+        # 1️⃣ Open VFS login page (visible to the user)
         driver.get("https://visa.vfsglobal.com/sgp/en/prt/login")
         print("🔗 Opened VFS Global login page. Waiting for user login...")
 
-        # 2️⃣ Wait for user to manually log in (detects login success)
+        # 2️⃣ Wait until user manually logs in (check for URL change)
         try:
-            WebDriverWait(driver, 300).until(EC.url_contains("/application-detail"))  # Waits up to 5 minutes
+            WebDriverWait(driver, 300).until(lambda d: "application-detail" in d.current_url)  # Waits up to 5 minutes
             print("✅ User has logged in successfully!")
         except:
             print("❌ Login timeout! User did not log in.")
