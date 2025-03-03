@@ -54,10 +54,9 @@ COPY --from=frontend /app /app
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # ✅ Install Node.js in the final stage
-RUN apt-get update && apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install -g npm@latest
+# Install Node.js directly from the Debian repository
+RUN apt-get update && apt-get install -y nodejs npm
+
 
 # Install Supervisor to manage both processes
 RUN apt-get install -y supervisor
