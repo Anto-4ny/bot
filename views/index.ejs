@@ -122,7 +122,7 @@ async function bookAppointment() {
     statusDiv.style.color = "yellow";
 
     try {
-        let response = await fetch("https://bot-production-9c23.up.railway.app/book", { 
+        let response = await fetch("/book", { 
             method: "GET",  // ✅ Changed from POST to GET
             headers: { "Content-Type": "application/json" }
         });
