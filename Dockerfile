@@ -64,6 +64,9 @@ RUN mkdir -p /var/log && touch /var/log/backend.out.log /var/log/backend.err.log
     /var/log/frontend.out.log /var/log/frontend.err.log \
     && chmod 777 /var/log/*
 
+# Install Gunicorn for Flask in production
+RUN pip install gunicorn
+
 # Expose backend (5000) & frontend (3000)
 EXPOSE 3000 5000
 
