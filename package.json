@@ -4,12 +4,10 @@
     "description": "Visa booking bot using Selenium (Python) and Express.js (Node.js) on Railway",
     "main": "server.js",
     "type": "module",
-    
     "scripts": {
         "start": "node server.js",
         "dev": "nodemon server.js",
-        "start-api": "python3 api.py",
-        "postinstall": "node postinstall.js"
+        "start-api": "python3 api.py"
     },
     "repository": {
         "type": "git",
@@ -34,6 +32,7 @@
         "cors": "^2.8.5",
         "ejs": "^3.1.10",
         "express": "^4.21.2",
-        "node-fetch": "^3.3.1"
+        "node-fetch": "^3.3.1",
+        "nodemon": "^3.1.9"
     }
 }
