@@ -6,7 +6,6 @@ from flask import Flask, jsonify
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
@@ -32,7 +31,7 @@ def install_chrome():
         print(f"❌ Chrome installation failed: {e}")
 
 def start_booking():
-    """Automate the booking process using Selenium."""
+    """Automate the booking process after manual login."""
     install_chrome()  # ✅ Ensure Chrome is installed
 
     options = Options()
@@ -60,30 +59,21 @@ def start_booking():
         
         # 1️⃣ Open VFS login page
         driver.get("https://visa.vfsglobal.com/sgp/en/prt/login")
-        print("🔗 Opened VFS Global login page...")
+        print("🔗 Opened VFS Global login page. Waiting for user login...")
 
-        # 2️⃣ Enter login credentials
+        # 2️⃣ Wait for user to manually log in (detects login success)
         try:
-            WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, "mat-input-0"))).send_keys("your-email@example.com")
-            WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, "mat-input-1"))).send_keys("your-password", Keys.RETURN)
-            print("✅ Login submitted! Waiting for redirection...")
-        except Exception:
-            print("❌ Failed to locate login fields. Check website structure.")
-            return {"status": "error", "message": "Login fields not found."}
-
-        # 3️⃣ Wait for login success (Modify the element if needed)
-        try:
-            WebDriverWait(driver, 15).until(EC.url_contains("/application-detail"))
-            print("✅ Successfully logged in!")
+            WebDriverWait(driver, 300).until(EC.url_contains("/application-detail"))  # Waits up to 5 minutes
+            print("✅ User has logged in successfully!")
         except:
-            print("❌ Login failed! Check credentials or CAPTCHA.")
-            return {"status": "error", "message": "Login failed."}
+            print("❌ Login timeout! User did not log in.")
+            return {"status": "error", "message": "User login timeout."}
 
-        # 4️⃣ Navigate to Application Detail page
+        # 3️⃣ Navigate to Application Detail page
         driver.get("https://visa.vfsglobal.com/cpv/en/prt/application-detail")
         print("📄 Navigated to booking page...")
 
-        # 5️⃣ Automate booking process
+        # 4️⃣ Automate booking process
         try:
             WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".available-date"))).click()
             print("✅ Date selected!")
