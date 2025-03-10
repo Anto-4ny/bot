@@ -25,7 +25,7 @@ def install_chrome():
         else:
             print("🟠 Linux detected: Installing Chromium...")
             subprocess.run(["apt-get", "update", "-y"], check=True)
-            subprocess.run(["apt-get", "install", "-y", "chromium-browser"], check=True)
+            subprocess.run(["apt-get", "install", "-y", "chromium"], check=True)
             print("✅ Chromium installed successfully!")
     except Exception as e:
         print(f"❌ Chromium installation failed: {e}")
@@ -37,21 +37,21 @@ def start_booking():
     options = Options()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    
-    # ✅ Toggle headless mode if needed (Uncomment for debugging)
-    # options.add_argument("--headless")
+    options.add_argument("--headless")  # ✅ Running headless for production
 
     print(f"🖥️ Running on: {sys.platform}")
     
     if not sys.platform.startswith("win"):
-        options.binary_location = "/usr/bin/chromium-browser"
+        options.binary_location = "/usr/bin/chromium"  # ✅ Correct binary path for Debian
         print(f"🔎 Using Chromium binary: {options.binary_location}")
     else:
         print("🟢 Running on Windows - Chrome must be installed manually.")
 
     try:
-        # ✅ Setup ChromeDriver path manually
-        chromedriver_path = "/usr/bin/chromedriver"  # Ensure Railway has this
+        # ✅ Automatically manage ChromeDriver
+        chromedriver_path = ChromeDriverManager().install()
+        print(f"🚀 ChromeDriver installed at: {chromedriver_path}")
+
         service = Service(chromedriver_path)
         driver = webdriver.Chrome(service=service, options=options)
         
