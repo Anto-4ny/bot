@@ -3,7 +3,7 @@ import path from "path";
 import cors from "cors";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import fetch from "node-fetch"; // ✅ Import fetch to communicate with Python API
+import fetch from "node-fetch"; // ✅ Import fetch
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,10 +35,14 @@ app.get("/book", async (req, res) => {
         console.log("📩 Booking request received");
 
         // ✅ Forward request to Python API using GET
-        const response = await fetch(`/book`, {
+        const response = await fetch(`${API_URL}/book`, {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
         const result = await response.json();
         res.json(result);
@@ -47,7 +51,6 @@ app.get("/book", async (req, res) => {
         res.status(500).json({ status: "error", message: "Server error occurred." });
     }
 });
-
 
 // ✅ Start server
 app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));

@@ -38,8 +38,8 @@ def start_booking():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     
-    # 🔥 Remove headless mode so user can see the browser
-    # options.add_argument("--headless")  <-- 🔴 COMMENT THIS OUT
+    # ✅ Allow user to see the browser
+    # options.add_argument("--headless")  # 🔴 Do not use headless mode for debugging
 
     print(f"🖥️ Running on: {sys.platform}")
     
@@ -58,17 +58,18 @@ def start_booking():
         driver = webdriver.Chrome(service=service, options=options)
         
         print("🚀 Launching Selenium Chrome...")
-        
-        # 1️⃣ Open VFS login page (visible to the user)
+
+        # 1️⃣ Open VFS login page
         driver.get("https://visa.vfsglobal.com/sgp/en/prt/login")
         print("🔗 Opened VFS Global login page. Waiting for user login...")
 
-        # 2️⃣ Wait until user manually logs in (check for URL change)
+        # 2️⃣ Wait until user manually logs in
         try:
-            WebDriverWait(driver, 300).until(lambda d: "application-detail" in d.current_url)  # Waits up to 5 minutes
+            WebDriverWait(driver, 300).until(lambda d: "application-detail" in d.current_url)
             print("✅ User has logged in successfully!")
         except:
             print("❌ Login timeout! User did not log in.")
+            driver.quit()
             return {"status": "error", "message": "User login timeout."}
 
         # 3️⃣ Navigate to Application Detail page
@@ -77,26 +78,32 @@ def start_booking():
 
         # 4️⃣ Automate booking process
         try:
-            WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".available-date"))).click()
+            available_date = WebDriverWait(driver, 15).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, ".available-date"))
+            )
+            available_date.click()
             print("✅ Date selected!")
 
-            driver.find_element(By.ID, "continue-button").click()
-            driver.find_element(By.ID, "submit-button").click()
+            continue_btn = driver.find_element(By.ID, "continue-button")
+            submit_btn = driver.find_element(By.ID, "submit-button")
+
+            continue_btn.click()
+            submit_btn.click()
             print("✅ Booking completed successfully!")
 
+            driver.quit()
             return {"status": "success", "message": "Booking Completed Successfully!"}
         
-        except Exception:
-            print("❌ Failed to complete booking. Element not found.")
-            return {"status": "error", "message": "Booking step failed."}
+        except Exception as e:
+            print(f"❌ Booking failed: {str(e)}")
+            print(traceback.format_exc())
+            driver.quit()
+            return {"status": "error", "message": "Booking step failed.", "error": str(e)}
 
     except Exception as e:
         print(f"❌ Booking failed: {str(e)}")
         print(traceback.format_exc())
         return {"status": "error", "message": "Internal Server Error", "error": str(e)}
-
-    finally:
-        driver.quit()
 
 @app.route("/book", methods=["GET"])
 def book():
