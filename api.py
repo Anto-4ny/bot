@@ -18,42 +18,40 @@ def home():
     return "🚀 Flask API is running!"
 
 def install_chrome():
-    """Ensure Chrome is installed (Linux only)."""
+    """Ensure Chromium is installed (Linux only)."""
     try:
         if sys.platform.startswith("win"):
             print("🟢 Windows detected: Ensure Chrome is installed manually.")
         else:
-            print("🟠 Linux detected: Installing Chrome...")
+            print("🟠 Linux detected: Installing Chromium...")
             subprocess.run(["apt-get", "update", "-y"], check=True)
-            subprocess.run(["apt-get", "install", "-y", "google-chrome-stable"], check=True)
-            print("✅ Chrome installed successfully!")
+            subprocess.run(["apt-get", "install", "-y", "chromium-browser"], check=True)
+            print("✅ Chromium installed successfully!")
     except Exception as e:
-        print(f"❌ Chrome installation failed: {e}")
+        print(f"❌ Chromium installation failed: {e}")
 
 def start_booking():
     """Automate the booking process after manual login."""
-    install_chrome()  # ✅ Ensure Chrome is installed
+    install_chrome()  # ✅ Ensure Chromium is installed
 
     options = Options()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     
-    # ✅ Allow user to see the browser
-    # options.add_argument("--headless")  # 🔴 Do not use headless mode for debugging
+    # ✅ Toggle headless mode if needed (Uncomment for debugging)
+    # options.add_argument("--headless")
 
     print(f"🖥️ Running on: {sys.platform}")
     
     if not sys.platform.startswith("win"):
-        options.binary_location = "/usr/bin/google-chrome"
-        print(f"🔎 Using Chrome binary: {options.binary_location}")
+        options.binary_location = "/usr/bin/chromium-browser"
+        print(f"🔎 Using Chromium binary: {options.binary_location}")
     else:
         print("🟢 Running on Windows - Chrome must be installed manually.")
 
     try:
-        # ✅ Setup ChromeDriver
-        chromedriver_path = ChromeDriverManager().install()
-        print(f"🚀 ChromeDriver installed at: {chromedriver_path}")
-
+        # ✅ Setup ChromeDriver path manually
+        chromedriver_path = "/usr/bin/chromedriver"  # Ensure Railway has this
         service = Service(chromedriver_path)
         driver = webdriver.Chrome(service=service, options=options)
         
@@ -113,4 +111,6 @@ def book():
     return jsonify(result)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True, threaded=True)
+    from waitress import serve
+    print("🚀 Starting Flask with Waitress...")
+    serve(app, host="0.0.0.0", port=5000)
