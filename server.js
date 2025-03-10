@@ -10,7 +10,7 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const API_URL = process.env.API_URL || "http://localhost:5000"; // ✅ Python API URL
+const API_URL = process.env.API_URL || "https://angelic-mindfulness-production.up.railway.app"; // ✅ Python API URL
 
 // ✅ Middleware
 app.use(cors());
