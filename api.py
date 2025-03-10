@@ -25,7 +25,7 @@ def install_chrome():
         else:
             print("🟠 Linux detected: Installing Chromium...")
             subprocess.run(["apt-get", "update", "-y"], check=True)
-            subprocess.run(["apt-get", "install", "-y", "chromium"], check=True)
+            subprocess.run(["apt-get", "install", "-y", "chromium", "chromedriver"], check=True)
             print("✅ Chromium installed successfully!")
     except Exception as e:
         print(f"❌ Chromium installation failed: {e}")
@@ -37,21 +37,30 @@ def start_booking():
     options = Options()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--headless")  # ✅ Running headless for production
+    options.add_argument("--headless")  # ✅ Run headless to save memory
+
+    # ✅ Optimize Chromium for Railway
+    options.add_argument("--disable-gpu")  # Disable GPU acceleration
+    options.add_argument("--disable-software-rasterizer")  # Reduce memory usage
+    options.add_argument("--single-process")  # Run as a single process (less RAM)
+    options.add_argument("--disable-background-networking")
+    options.add_argument("--disable-background-timer-throttling")
+    options.add_argument("--disable-backgrounding-occluded-windows")
+    options.add_argument("--disable-client-side-phishing-detection")
+    options.add_argument("--disable-default-apps")
+    options.add_argument("--no-first-run")
 
     print(f"🖥️ Running on: {sys.platform}")
     
     if not sys.platform.startswith("win"):
-        options.binary_location = "/usr/bin/chromium"  # ✅ Correct binary path for Debian
+        options.binary_location = "/usr/bin/chromium"  # ✅ Correct path for Debian-based systems
         print(f"🔎 Using Chromium binary: {options.binary_location}")
     else:
         print("🟢 Running on Windows - Chrome must be installed manually.")
 
     try:
         # ✅ Automatically manage ChromeDriver
-        chromedriver_path = ChromeDriverManager().install()
-        print(f"🚀 ChromeDriver installed at: {chromedriver_path}")
-
+        chromedriver_path = "/usr/bin/chromedriver"  # Pre-installed in Railway
         service = Service(chromedriver_path)
         driver = webdriver.Chrome(service=service, options=options)
         
